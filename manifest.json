@@ -1,0 +1,30 @@
+{
+  "name": "Prudêncio Checklist",
+  "short_name": "Prudêncio",
+  "description": "Segurança e Inspeção Operacional de Empilhadeiras",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0D0D0D",
+  "theme_color": "#FFC107",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/mascote.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/mascote.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/mascote.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ]
+}

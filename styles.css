@@ -1,0 +1,2059 @@
+/* Importação das Fontes */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Variáveis Globais de Design */
+:root {
+  --bg-primary: #0D0D0D;
+  --bg-surface: rgba(30, 30, 30, 0.75);
+  --bg-surface-solid: #1E1E1E;
+  --color-primary: #FFC107; /* Amarelo Industrial */
+  --color-text-main: #F2F2F2;
+  --color-text-muted: rgba(242, 242, 242, 0.7);
+  --color-success: #2ECC71;
+  --color-warning: #FF9F43;
+  --color-danger: #EA5455;
+  --border-radius: 16px;
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --shadow-premium: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 4px 12px 0 rgba(255, 193, 7, 0.05);
+  --shadow-neon: 0 0 15px rgba(255, 193, 7, 0.4);
+}
+
+/* Reset Geral e Configurações de Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--color-text-main);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tipografia */
+h1, h2, h3, .bebas-font {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1.5px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Estrutura Central SPA */
+#app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(0.98);
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow-y: auto;
+  padding: 80px 16px 90px 16px; /* Desconto para AppBar e NavBar */
+  background-color: var(--bg-primary);
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+  z-index: 10;
+}
+
+/* Componente Global: AppBar */
+.app-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid rgba(255, 193, 7, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.app-bar .logo {
+  font-size: 24px;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.app-bar .title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.app-bar .actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.notification-btn {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--color-text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+
+.notification-btn:hover {
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: var(--color-danger);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-primary);
+  object-fit: cover;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.user-avatar:hover {
+  box-shadow: var(--shadow-neon);
+}
+
+/* Componente Global: NavBar (Menu Inferior) */
+.nav-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 72px;
+  background: rgba(13, 13, 13, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 8px;
+  z-index: 100;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+  cursor: pointer;
+  border: none;
+  background: none;
+  gap: 4px;
+}
+
+.nav-item i {
+  font-size: 20px;
+}
+
+.nav-item.active {
+  color: var(--color-primary);
+  text-shadow: var(--shadow-neon);
+}
+
+.nav-item:active {
+  transform: scale(0.9);
+}
+
+/* Estilos de Vidro Fosco (Glassmorphism) */
+.glass-card {
+  background: var(--bg-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-premium);
+  transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+/* Botões Premium Robustos */
+.btn-primary {
+  height: 56px;
+  width: 100%;
+  background-color: var(--color-primary);
+  color: #000;
+  border: none;
+  border-radius: var(--border-radius);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow-premium);
+  transition: var(--transition-smooth);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(255, 193, 7, 0.25);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-secondary {
+  height: 56px;
+  width: 100%;
+  background-color: transparent;
+  color: var(--color-text-main);
+  border: 2px solid rgba(242, 242, 242, 0.1);
+  border-radius: var(--border-radius);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-secondary:active {
+  transform: scale(0.95);
+}
+
+/* Inputs Premium */
+.input-group {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.input-label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.input-field-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-field-wrapper i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  transition: var(--transition-smooth);
+}
+
+.input-field {
+  width: 100%;
+  height: 56px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius);
+  color: var(--color-text-main);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  padding: 0 16px 0 48px;
+  transition: var(--transition-smooth);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.15);
+  background-color: rgba(255, 193, 7, 0.02);
+}
+
+.input-field:focus + i {
+  color: var(--color-primary);
+}
+
+/* ------------------- TELA 1: SPLASH SCREEN ------------------- */
+#screen-splash {
+  padding: 0;
+  z-index: 200; /* Fica acima de tudo no início */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.splash-mascote-container {
+  margin-bottom: 30px;
+  position: relative;
+  animation: floatMascot 4s ease-in-out infinite;
+}
+
+.splash-mascote {
+  width: 200px;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 30px;
+  box-shadow: 0 15px 45px rgba(255, 193, 7, 0.15);
+  border: 2px solid rgba(255, 193, 7, 0.2);
+}
+
+.splash-title-app {
+  font-size: 56px;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 193, 7, 0.3);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideUpFade 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards 0.5s;
+  text-align: center;
+}
+
+.splash-slogan {
+  position: absolute;
+  bottom: 50px;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  font-style: italic;
+  letter-spacing: 1px;
+  text-align: center;
+  width: 90%;
+  max-width: 320px;
+  opacity: 0;
+  animation: slideUpFade 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards 1s;
+}
+
+@keyframes floatMascot {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes slideUpFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------- TELA 2: LOGIN ------------------- */
+#screen-login {
+  padding: 30px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.login-mascote {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  object-fit: cover;
+  margin: -70px auto 20px auto;
+  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.2);
+  display: block;
+}
+
+.login-title {
+  font-size: 32px;
+  color: var(--color-primary);
+  margin-bottom: 24px;
+}
+
+.login-footer {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.forgot-password {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  transition: var(--transition-smooth);
+}
+
+.forgot-password:hover {
+  color: var(--color-primary);
+}
+
+.biometrics-group {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.biometrics-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.biometrics-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.1);
+}
+
+/* ------------------- TELA 3: DASHBOARD PRINCIPAL ------------------- */
+.dashboard-greeting {
+  font-size: 28px;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.dashboard-motivation {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
+}
+
+/* Grid de KPIs */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  padding: 16px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 110px;
+  position: relative;
+}
+
+.kpi-icon {
+  width: 32px;
+  height: 32px;
+  background-color: rgba(255, 193, 7, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.kpi-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.kpi-value {
+  font-size: 24px;
+  font-family: 'Bebas Neue', sans-serif;
+  color: var(--color-text-main);
+  margin-top: 4px;
+}
+
+.kpi-card.alert-kpi .kpi-icon {
+  background-color: rgba(234, 84, 85, 0.1);
+  color: var(--color-danger);
+}
+
+/* Velocímetro de Conformidade */
+.gauge-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+}
+
+.gauge-container {
+  position: relative;
+  width: 200px;
+  height: 100px;
+  overflow: hidden;
+}
+
+.gauge-svg {
+  width: 200px;
+  height: 200px;
+  transform: rotate(-180deg);
+}
+
+.gauge-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-width: 16;
+}
+
+.gauge-progress {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 16;
+  stroke-dasharray: 282.7;
+  stroke-dashoffset: 282.7; /* Será controlado via JS */
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.gauge-value {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 36px;
+  font-family: 'Bebas Neue', sans-serif;
+  color: var(--color-primary);
+}
+
+.gauge-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Alertas Recentes */
+.alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  margin-bottom: 0;
+  border-left: 4px solid var(--color-warning);
+}
+
+.alert-item.critical {
+  border-left-color: var(--color-danger);
+}
+
+.alert-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.alert-item-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.alert-item-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.alert-badge {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background-color: rgba(255, 159, 67, 0.1);
+  color: var(--color-warning);
+}
+
+.alert-item.critical .alert-badge {
+  background-color: rgba(234, 84, 85, 0.1);
+  color: var(--color-danger);
+}
+
+/* ------------------- TELA 4 & 5: CHECKLISTS ------------------- */
+.checklist-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.forklift-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.checklist-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checklist-header-title {
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.checklist-header-subtitle {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* Lista de Itens do Checklist */
+.checklist-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.checklist-item-card {
+  padding: 16px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checklist-item-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.checklist-item-name {
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checklist-item-name i {
+  color: var(--color-primary);
+  font-size: 18px;
+}
+
+.checklist-item-card.answered-ok {
+  border-left: 4px solid var(--color-success);
+}
+.checklist-item-card.answered-warning {
+  border-left: 4px solid var(--color-warning);
+}
+.checklist-item-card.answered-danger {
+  border-left: 4px solid var(--color-danger);
+}
+
+.status-button-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.status-btn {
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.status-btn-ok:hover, .status-btn-ok.active {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.status-btn-warning:hover, .status-btn-warning.active {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.status-btn-danger:hover, .status-btn-danger.active {
+  background-color: rgba(234, 84, 85, 0.15);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.fixed-bottom-container {
+  position: relative;
+  width: 100%;
+  padding: 16px 0 24px 0;
+  background: transparent;
+  z-index: 90;
+}
+
+/* Modais Especiais e Bloqueios */
+.block-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--transition-smooth);
+}
+
+.block-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.block-modal-content {
+  background: rgba(20, 20, 20, 0.95);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--border-radius);
+  padding: 30px 20px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(234, 84, 85, 0.2);
+  transform: translateY(30px);
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.block-modal.active .block-modal-content {
+  transform: translateY(0);
+}
+
+.block-mascote {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid var(--color-danger);
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+.block-title {
+  font-size: 26px;
+  color: var(--color-danger);
+  margin-bottom: 12px;
+}
+
+.block-desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* ------------------- TELA 6: MANUTENÇÃO ------------------- */
+.sub-tabs-container {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sub-tab-btn {
+  flex: 1;
+  height: 40px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.sub-tab-btn.active {
+  background-color: var(--color-primary);
+  color: #000;
+}
+
+.maintenance-section {
+  display: none;
+}
+
+.maintenance-section.active {
+  display: block;
+}
+
+/* Calendário Preventivo */
+.calendar-widget {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.calendar-month {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.calendar-day-label {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+}
+
+.calendar-day.marked::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  box-shadow: 0 0 4px var(--color-primary);
+}
+
+.calendar-day.active {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+/* Horímetro */
+.horometer-wrapper {
+  margin-top: 10px;
+}
+
+.horometer-bar {
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.horometer-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-neon);
+  transition: width 1s ease-in-out;
+}
+
+/* Botão Flutuante */
+.floating-action-btn {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.4);
+  cursor: pointer;
+  z-index: 95;
+  transition: var(--transition-smooth);
+}
+
+.floating-action-btn:hover {
+  transform: scale(1.1) rotate(90deg);
+}
+
+.floating-action-btn:active {
+  transform: scale(0.9);
+}
+
+/* ------------------- TELA 7: RELATÓRIOS ------------------- */
+.horizontal-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+  scrollbar-width: none;
+}
+
+.horizontal-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.chip.active, .chip:hover {
+  background-color: var(--color-primary);
+  color: #000;
+  border-color: var(--color-primary);
+}
+
+.report-card {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.report-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.report-icon-box {
+  width: 44px;
+  height: 44px;
+  background-color: rgba(255, 193, 7, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.report-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.report-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.report-meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.share-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-primary);
+}
+
+/* ------------------- TELA 8: RANKING (GAMIFICAÇÃO) ------------------- */
+.podium-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  height: 180px;
+  margin-bottom: 24px;
+  margin-top: 20px;
+}
+
+.podium-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.podium-avatar-wrapper {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.podium-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.podium-column.first .podium-avatar {
+  width: 80px;
+  height: 80px;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+}
+
+.podium-column.second .podium-avatar {
+  border-color: #B2BEC3;
+}
+
+.podium-column.third .podium-avatar {
+  border-color: #D35400;
+}
+
+.podium-badge {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.podium-column.first .podium-badge { background-color: var(--color-primary); color: #000; }
+.podium-column.second .podium-badge { background-color: #B2BEC3; color: #000; }
+.podium-column.third .podium-badge { background-color: #D35400; color: white; }
+
+.podium-block {
+  width: 100%;
+  background: linear-gradient(to top, rgba(30, 30, 30, 0.9), rgba(30, 30, 30, 0.5));
+  border-radius: 12px 12px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+}
+
+.podium-column.first .podium-block { height: 90px; border-color: rgba(255, 193, 7, 0.2); }
+.podium-column.second .podium-block { height: 65px; }
+.podium-column.third .podium-block { height: 50px; }
+
+.podium-name {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.podium-points {
+  font-size: 11px;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+/* Lista do Ranking */
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ranking-item {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ranking-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ranking-position {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Bebas Neue', sans-serif;
+  color: var(--color-text-muted);
+  width: 24px;
+}
+
+.ranking-item-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ranking-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ranking-item-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ranking-progress-bg {
+  width: 80px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ranking-progress-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+}
+
+.ranking-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ranking-score {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+/* ------------------- TELA 9: TREINAMENTOS ------------------- */
+.carousel-container {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+  scrollbar-width: none;
+}
+
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.video-card {
+  flex-shrink: 0;
+  width: 260px;
+  height: 150px;
+  border-radius: var(--border-radius);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+}
+
+.video-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+}
+
+.video-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.video-duration {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+/* POPs e DDS */
+.training-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.accordion-item {
+  padding: 16px;
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.accordion-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.accordion-content {
+  display: none;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 12px;
+}
+
+.accordion-item.active .accordion-content {
+  display: block;
+}
+
+/* Banner Motivacional */
+.motivation-banner {
+  background: linear-gradient(135deg, #1E1E1E 0%, #0D0D0D 100%);
+  border: 1px solid rgba(255, 193, 7, 0.15);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.motivation-banner::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  opacity: 0.05;
+  filter: blur(20px);
+}
+
+.banner-mascote {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--color-primary);
+}
+
+.banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.banner-headline {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.banner-sub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ------------------- TELA 10: PERFIL DO USUÁRIO ------------------- */
+.profile-card {
+  text-align: center;
+  padding: 24px 16px;
+  margin-top: 10px;
+}
+
+.profile-avatar-large {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 3px solid var(--color-primary);
+  box-shadow: var(--shadow-neon);
+  object-fit: cover;
+  margin-bottom: 16px;
+}
+
+.profile-name {
+  font-size: 24px;
+  color: var(--color-text-main);
+  margin-bottom: 4px;
+}
+
+.profile-role {
+  font-size: 13px;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-item {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.option-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.option-icon-box {
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: var(--transition-smooth);
+}
+
+.option-item:hover .option-icon-box {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: var(--color-primary);
+}
+
+.option-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.option-item.logout-option {
+  border-color: rgba(234, 84, 85, 0.15);
+}
+
+.option-item.logout-option .option-icon-box {
+  color: var(--color-danger);
+}
+
+.option-item.logout-option:hover .option-icon-box {
+  background-color: rgba(234, 84, 85, 0.1);
+}
+
+/* ------------------- TELA 11: CONFIGURAÇÕES E ADMIN ------------------- */
+.admin-card {
+  padding: 20px;
+}
+
+.admin-section-title {
+  font-size: 18px;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+.user-management-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-management-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.user-mgmt-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-mgmt-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-mgmt-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.user-mgmt-role {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.audit-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.audit-log-item {
+  font-size: 12px;
+  padding: 10px;
+  border-left: 2px solid var(--color-primary);
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.audit-log-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.audit-log-desc {
+  color: var(--color-text-main);
+}
+
+/* ------------------- RECURSOS DE MARCA D'ÁGUA E ADMIN CROWNS ------------------- */
+.mascot-watermark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  height: 90vw;
+  max-width: 600px;
+  max-height: 600px;
+  background-image: url('assets/mascote.jpg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.035; /* Marca d'água super sutil e elegante */
+  pointer-events: none; /* Crucial: não obstrui toques */
+  z-index: 0;
+  border-radius: 50%;
+  filter: grayscale(1) contrast(1.05);
+}
+
+.add-btn-small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #000;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 10px rgba(255, 193, 7, 0.2);
+}
+
+.add-btn-small:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-neon);
+}
+
+.add-btn-small i {
+  width: 20px;
+  height: 20px;
+}
+
+/* Switches elegantes para turnos */
+.switch-container {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 22px;
+}
+
+.switch-container input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: var(--transition-smooth);
+  border-radius: 22px;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--color-text-muted);
+  transition: var(--transition-smooth);
+  border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+  background-color: rgba(255, 193, 7, 0.2);
+  border-color: var(--color-primary);
+}
+
+input:checked + .switch-slider:before {
+  transform: translateX(20px);
+  background-color: var(--color-primary);
+  box-shadow: 0 0 8px var(--color-primary);
+}
+
+/* Ações de Frota Admin */
+.fleet-action-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.fleet-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.fleet-action-btn:hover {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.fleet-action-btn.delete:hover {
+  background-color: rgba(234, 84, 85, 0.1);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.fleet-action-btn i {
+  width: 16px;
+  height: 16px;
+}
+
+/* Animação de erro para senhas */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.shake {
+  animation: shake 0.4s ease-in-out;
+  border-color: var(--color-danger) !important;
+}
+
+/* Scorecard Card Grid */
+.scorecard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.scorecard-metric {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+.metric-label { font-size: 11px; color: var(--color-text-muted); }
+.metric-value { font-size: 20px; font-weight: bold; margin: 4px 0; }
+.metric-delta { font-size: 10px; color: var(--color-text-muted); }
+.text-success { color: var(--color-success); }
+.text-danger { color: var(--color-danger); }
+.text-primary { color: var(--color-primary); }
+
+/* Seleção de Tipo de Checklist */
+.checklist-type-selector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.type-option {
+  background: rgba(30, 30, 30, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 14px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.type-option i {
+  font-size: 20px;
+  color: var(--color-text-muted);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.type-option-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.type-title {
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  transition: all 0.3s ease;
+}
+
+.type-desc {
+  font-size: 9px;
+  color: rgba(242, 242, 242, 0.4);
+}
+
+/* Hover e Estados Ativos */
+.type-option:hover {
+  background: rgba(255, 255, 255, 0.02);
+  transform: translateY(-2px);
+}
+
+/* Verde para Inicial */
+.type-option.type-initial.active {
+  background: rgba(46, 204, 113, 0.1);
+  border-color: #2ECC71;
+  box-shadow: 0 0 15px rgba(46, 204, 113, 0.15);
+}
+
+.type-option.type-initial.active i {
+  color: #2ECC71;
+}
+
+.type-option.type-initial.active .type-title {
+  color: #2ECC71;
+}
+
+/* Vermelho para Final */
+.type-option.type-final.active {
+  background: rgba(234, 84, 85, 0.1);
+  border-color: #EA5455;
+  box-shadow: 0 0 15px rgba(234, 84, 85, 0.15);
+}
+
+.type-option.type-final.active i {
+  color: #EA5455;
+}
+
+.type-option.type-final.active .type-title {
+  color: #EA5455;
+}
+
+/* Grid de Status da Frota no Dashboard */
+.fleet-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.fleet-status-card {
+  background: rgba(30, 30, 30, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.fleet-status-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.fleet-status-card.status-liberada {
+  border-color: rgba(46, 204, 113, 0.15);
+}
+
+.fleet-status-card.status-liberada::before {
+  background-color: #2ECC71;
+  box-shadow: 0 0 8px #2ECC71;
+}
+
+.fleet-status-card.status-bloqueada {
+  border-color: rgba(234, 84, 85, 0.15);
+}
+
+.fleet-status-card.status-bloqueada::before {
+  background-color: #EA5455;
+  box-shadow: 0 0 8px #EA5455;
+}
+
+.fleet-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fleet-card-id {
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  color: var(--color-text-main);
+}
+
+.fleet-card-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.fleet-status-card.status-liberada .fleet-card-dot {
+  background-color: #2ECC71;
+  box-shadow: 0 0 8px #2ECC71;
+}
+
+.fleet-status-card.status-bloqueada .fleet-card-dot {
+  background-color: #EA5455;
+  box-shadow: 0 0 8px #EA5455;
+}
+
+.fleet-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fleet-card-model {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fleet-card-status-text {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.fleet-status-card.status-liberada .fleet-card-status-text {
+  color: #2ECC71;
+}
+
+.fleet-status-card.status-bloqueada .fleet-card-status-text {
+  color: #EA5455;
+}
+
+/* --- Novos Estilos: Miniatura e Upload de Fotos --- */
+.evidence-photo-container {
+  width: 100%;
+}
+
+.operator-photo-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.operator-photo-preview-box {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px dashed var(--color-primary);
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(0,0,0,0.3);
+  transition: var(--transition-smooth);
+}
+
+.operator-photo-preview-box:hover {
+  border-color: var(--color-success);
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
+}
+
+/* --- Estilos do Canvas de Assinatura --- */
+.signature-canvas {
+  width: 100%;
+  height: 120px;
+  touch-action: none;
+  background: #000000;
+  cursor: crosshair;
+}
+
+/* --- Estilos de Impressão de Relatório A4 PDF --- */
+@media print {
+  /* Oculta tudo que não faz parte do documento a ser impresso */
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  #app-container > * {
+    display: none !important;
+  }
+  
+  /* Força a exibição do visualizador de laudo técnico técnico */
+  #modal-checklist-detail.block-modal {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    background: #ffffff !important;
+    display: block !important;
+    z-index: 99999 !important;
+    padding: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  .print-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Converte textos para preto e limpa efeitos de neon no papel */
+  .print-container * {
+    color: #000000 !important;
+    text-shadow: none !important;
+  }
+  
+  .print-header {
+    border-bottom: 2px solid #000000 !important;
+    margin-bottom: 20px !important;
+  }
+  
+  .bebas-font {
+    color: #000000 !important;
+  }
+  
+  #detail-checklist-meta {
+    background: #f9f9f9 !important;
+    border: 1px solid #dddddd !important;
+    color: #000000 !important;
+  }
+  
+  #detail-checklist-items {
+    background: #ffffff !important;
+    border: 1px solid #cccccc !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  #detail-checklist-items div {
+    border-bottom: 1px solid #eeeeee !important;
+  }
+  
+  /* Inverte a assinatura para ficar preta sobre fundo branco */
+  #detail-checklist-signature {
+    filter: invert(1) !important;
+    mix-blend-mode: multiply;
+  }
+  
+  /* Oculta os botões do visualizador de laudo técnico */
+  .no-print {
+    display: none !important;
+  }
+}
+
