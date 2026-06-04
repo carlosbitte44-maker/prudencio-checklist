@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Prudêncio Checklist - Segurança Operacional</title>
+  
+  <link rel="stylesheet" href="estilo.css">
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FFC107">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Prudêncio">
+  <link rel="apple-touch-icon" href="assets/mascote.jpg">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.min.js"></script>
+</head>
+<body>
+
+  <div id="app-container">
+    
+    <!-- SPLASH SCREEN -->
+    <section class="screen active" id="screen-splash">
+      <div class="splash-mascote-container" id="floating-mascot" onclick="startApp()">
+        <img src="assets/mascote.jpg" alt="Mascote Prudêncio" class="splash-mascote floating">
+      </div>
+      <h1 class="splash-title-app">PRUDÊNCIO CHECKLIST</h1>
+      <div class="splash-slogan">"Segurança não é sorte. É Prudência."</div>
+    </section>
+
+    <!-- LOGIN -->
+    <section class="screen" id="screen-login">
+      <div class="glass-card login-card">
+        <img src="assets/mascote.jpg" alt="Mascote" class="login-mascote">
+        <h2 class="login-title">ENTRAR NO SISTEMA</h2>
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="input-group">
+            <label class="input-label">Usuário / Registro</label>
+            <div class="input-field-wrapper">
+              <input type="text" class="input-field" id="login-user" required placeholder="Ex: PRU-902">
+              <i data-lucide="user"></i>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Senha Operacional</label>
+            <div class="input-field-wrapper">
+              <input type="password" class="input-field" id="login-pass" required placeholder="••••••">
+              <i data-lucide="lock"></i>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">ENTRAR</button>
+        </form>
+        <div class="login-footer">
+          <a href="#" class="forgot-password" onclick="alert('Contate o administrador.'); return false;">Esqueci minha senha</a>
+          <div class="biometrics-group">
+            <button type="button" class="biometrics-btn" onclick="simulateFingerprint()"><i data-lucide="fingerprint"></i></button>
+            <button type="button" class="biometrics-btn" onclick="openScanner()"><i data-lucide="qr-code"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="screen" id="screen-dashboard">
+      <div class="app-bar">
+        <div class="logo">PRUDÊNCIO</div>
+        <div class="title" id="appbar-title">Painel de Controle</div>
+        <div class="actions">
+          <img src="assets/mascote.jpg" class="user-avatar" id="appbar-avatar" onclick="navigateTo('screen-profile')">
+        </div>
+      </div>
+
+      <h2 class="dashboard-greeting">Bom dia, <span id="operator-name">Operador</span>!</h2>
+      <div class="dashboard-motivation">Segurança sempre em primeiro lugar. Vamos ao checklist de hoje!</div>
+
+      <div class="kpi-grid">
+        <div class="glass-card kpi-card"><div class="kpi-icon"><i data-lucide="check-circle-2"></i></div><div><div class="kpi-title">Ativas</div><div class="kpi-value">12 / 14</div></div></div>
+        <div class="glass-card kpi-card alert-kpi"><div class="kpi-icon"><i data-lucide="alert-triangle"></i></div><div><div class="kpi-title">Bloqueadas</div><div class="kpi-value" id="kpi-blocked-count">2</div></div></div>
+        <div class="glass-card kpi-card"><div class="kpi-icon"><i data-lucide="clock"></i></div><div><div class="kpi-title">Pendentes</div><div class="kpi-value">1</div></div></div>
+        <div class="glass-card kpi-card"><div class="kpi-icon"><i data-lucide="shield-check"></i></div><div><div class="kpi-title">Conformidade</div><div class="kpi-value" id="kpi-conformity-value">94%</div></div></div>
+      </div>
+
+      <button class="btn-primary" onclick="openScanner()"><i data-lucide="qr-code"></i> ESCANEAR EMPILHADEIRA</button>
+
+      <div class="glass-card">
+        <div class="gauge-section">
+          <div class="gauge-container">
+            <svg class="gauge-svg" viewBox="0 0 200 110">
+              <circle class="gauge-bg" cx="100" cy="100" r="90"></circle>
+              <circle class="gauge-progress" id="conformity-gauge" cx="100" cy="100" r="90" stroke-dasharray="282.7" stroke-dashoffset="0"></circle>
+            </svg>
+            <div class="gauge-value" id="gauge-percent">94%</div>
+          </div>
+          <div class="gauge-label">Score de Segurança Geral</div>
+        </div>
+      </div>
+
+      <h3>Status da Frota</h3>
+      <div class="fleet-status-grid" id="dashboard-fleet-list"></div>
+
+      <h3>Alertas Recentes</h3>
+      <div class="alert-list" id="dashboard-alerts-list"></div>
+
+      <!-- NAVBAR (MENU INFERIOR) -->
+      <nav class="nav-bar">
+        <button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button>
+        <button class="nav-item" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button>
+        <button class="nav-item" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button>
+      </nav>
+    </section>
+
+    <!-- PRÉ-CHECKLIST -->
+    <section class="screen" id="screen-pre-checklist">
+      <div class="app-bar">
+        <div class="logo">PRUDÊNCIO</div>
+        <div class="title" id="appbar-title">Preparar Jornada</div>
+        <div class="actions">
+          <img src="assets/mascote.jpg" class="user-avatar" onclick="navigateTo('screen-profile')">
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <form id="pre-checklist-form" onsubmit="startChecklistFromPrep(event)">
+          <div class="input-group">
+            <label>Tipo de Checklist</label>
+            <div class="checklist-type-selector">
+              <div class="type-option type-initial active" id="type-opt-start" onclick="selectChecklistType('start')">
+                <i data-lucide="clipboard-check"></i>
+                <span class="type-title" style="color: green;">INÍCIO DE JORNADA</span>
+              </div>
+              <div class="type-option type-final" id="type-opt-end" onclick="selectChecklistType('end')">
+                <i data-lucide="log-out"></i>
+                <span class="type-title" style="color: red;">FIM DE JORNADA</span>
+              </div>
+            </div>
+            <input type="hidden" id="pre-checklist-type" value="start">
+          </div>
+
+          <div class="input-group">
+            <label>Nome do Operador</label>
+            <input type="text" class="input-field" id="pre-operator-name" required>
+          </div>
+
+          <div class="input-group">
+            <label>Equipamento</label>
+            <input type="text" class="input-field" id="pre-machine-id" readonly>
+          </div>
+
+          <div class="input-group">
+            <label>Modelo</label>
+            <input type="text" class="input-field" id="pre-machine-model" required>
+          </div>
+
+          <div class="input-group">
+            <label>Horímetro</label>
+            <input type="number" class="input-field" id="pre-horometer" required>
+          </div>
+
+          <div class="input-group">
+            <label>Turno</label>
+            <select class="input-field" id="pre-shift"></select>
+          </div>
+
+          <button type="submit" class="btn-primary">INICIAR CHECKLIST</button>
+        </form>
+      </div>
+
+      <nav class="nav-bar">
+        <button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button>
+        <button class="nav-item active" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button>
+        <button class="nav-item" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button>
+      </nav>
+    </section>
+
+    <!-- CHECKLIST INÍCIO -->
+    <section class="screen" id="screen-checklist-start">
+      <div class="app-bar">
+        <div class="logo">PRUDÊNCIO</div>
+        <div class="title">Checklist Início</div>
+        <div class="actions">
+          <img src="assets/mascote.jpg" class="user-avatar" onclick="navigateTo('screen-profile')">
+        </div>
+      </div>
+      <div class="checklist-items-container" id="checklist-start-items"></div>
+      <div class="signature-section glass-card">
+        <div class="signature-title"><i data-lucide="pen-tool"></i> Assinatura Digital</div>
+        <canvas id="signature-start-canvas" class="signature-canvas"></canvas>
+        <button class="btn-secondary" onclick="clearSignature('start')">Limpar</button>
+      </div>
+      <button class="btn-primary" onclick="submitChecklist('start')">FINALIZAR CHECKLIST</button>
+      
+      <nav class="nav-bar">
+        <button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button>
+        <button class="nav-item active" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button>
+        <button class="nav-item" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button>
+      </nav>
+    </section>
+
+    <!-- CHECKLIST FIM -->
+    <section class="screen" id="screen-checklist-end">
+      <div class="app-bar">
+        <div class="logo">PRUDÊNCIO</div>
+        <div class="title">Checklist Fim</div>
+        <div class="actions">
+          <img src="assets/mascote.jpg" class="user-avatar" onclick="navigateTo('screen-profile')">
+        </div>
+      </div>
+      <div class="checklist-items-container" id="checklist-end-items"></div>
+      <div class="signature-section glass-card">
+        <div class="signature-title"><i data-lucide="pen-tool"></i> Assinatura Digital</div>
+        <canvas id="signature-end-canvas" class="signature-canvas"></canvas>
+        <button class="btn-secondary" onclick="clearSignature('end')">Limpar</button>
+      </div>
+      <button class="btn-primary" onclick="submitChecklist('end')">FINALIZAR CHECKLIST</button>
+      
+      <nav class="nav-bar">
+        <button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button>
+        <button class="nav-item active" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button>
+        <button class="nav-item" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button>
+        <button class="nav-item" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button>
+      </nav>
+    </section>
+
+    <!-- MANUTENÇÃO -->
+    <section class="screen" id="screen-maintenance">
+      <div class="app-bar"><div class="logo">PRUDÊNCIO</div><div class="title">Manutenção</div><div class="actions"><img src="assets/mascote.jpg" class="user-avatar" onclick="navigateTo('screen-profile')"></div></div>
+      <div class="sub-tab-bar">
+        <button class="sub-tab-btn active" onclick="switchMaintenanceTab('tickets', this)">Chamados</button>
+        <button class="sub-tab-btn" onclick="switchMaintenanceTab('history', this)">Histórico</button>
+      </div>
+      <div class="maintenance-section active" id="maintenance-tickets"><div id="tickets-list"></div><button class="btn-primary" onclick="toggleModal('modal-new-ticket')">Novo Chamado</button></div>
+      <div class="maintenance-section" id="maintenance-history"><div id="history-list"></div></div>
+      <nav class="nav-bar"><button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button><button class="nav-item" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button><button class="nav-item active" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button><button class="nav-item" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button><button class="nav-item" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button><button class="nav-item" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button></nav>
+    </section>
+
+    <!-- RANKING -->
+    <section class="screen" id="screen-ranking">
+      <div class="app-bar"><div class="logo">PRUDÊNCIO</div><div class="title">Ranking</div><div class="actions"><img src="assets/mascote.jpg" class="user-avatar" onclick="navigateTo('screen-profile')"></div></div>
+      <div class="ranking-podium" id="ranking-podium"></div>
+      <div class="ranking-table" id="ranking-table-list"></div>
+      <nav class="nav-bar"><button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button><button class="nav-item" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button><button class="nav-item" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button><button class="nav-item active" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button><button class="nav-item" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button><button class="nav-item" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button></nav>
+    </section>
+
+    <!-- TREINAMENTOS -->
+    <section class="screen" id="screen-trainings">
+      <div class="app-bar"><div class="logo">PRUDÊNCIO</div><div class="title">Treinamentos</div><div class="actions"><img src="assets/mascote.jpg" class="user-avatar" onclick="navigateTo('screen-profile')"></div></div>
+      <div class="accordion-container">
+        <div class="accordion-item" id="accordion-1"><div class="accordion-header" onclick="toggleAccordion('accordion-1')"><span>📘 Operação Segura</span><i data-lucide="chevron-down"></i></div><div class="accordion-content"><p>Curso NR-11</p><button class="btn-secondary" onclick="openPDF()">PDF</button><button class="btn-primary" onclick="playVideo()">Vídeo</button></div></div>
+        <div class="accordion-item" id="accordion-2"><div class="accordion-header" onclick="toggleAccordion('accordion-2')"><span>⚠️ Prevenção de Acidentes</span><i data-lucide="chevron-down"></i></div><div class="accordion-content"><p>DDS Segurança</p><button class="btn-secondary" onclick="openPDF()">PDF</button><button class="btn-primary" onclick="playVideo()">Vídeo</button></div></div>
+      </div>
+      <nav class="nav-bar"><button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button><button class="nav-item" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button><button class="nav-item" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button><button class="nav-item" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button><button class="nav-item active" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button><button class="nav-item" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button></nav>
+    </section>
+
+    <!-- PERFIL -->
+    <section class="screen" id="screen-profile">
+      <div class="app-bar"><div class="logo">PRUDÊNCIO</div><div class="title">Perfil</div><div class="actions"><img src="assets/mascote.jpg" class="user-avatar" onclick="navigateTo('screen-profile')"></div></div>
+      <div class="profile-header"><img src="assets/mascote.jpg" id="profile-avatar" class="profile-avatar-large"><h2 id="profile-name">Carregando...</h2><p id="profile-role"></p></div>
+      <div class="glass-card"><h3>📊 Desempenho</h3><div class="stats-grid"><div class="stat-item"><span class="stat-label">Horas</span><span id="profile-hours">0h</span></div><div class="stat-item"><span class="stat-label">Avarias</span><span id="profile-avarias">0</span></div><div class="stat-item"><span class="stat-label">Treinos</span><span id="profile-trainings">0</span></div><div class="stat-item"><span class="stat-label">Checklists</span><span id="profile-checklists">0</span></div><div class="stat-item total-score"><span class="stat-label">Pontuação</span><span id="profile-total-score">0</span></div></div></div>
+      <button class="btn-secondary logout-btn" onclick="handleLogout()">Sair</button>
+      <nav class="nav-bar"><button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button><button class="nav-item" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button><button class="nav-item" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button><button class="nav-item" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button><button class="nav-item" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button><button class="nav-item" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button></nav>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="screen" id="screen-admin">
+      <div class="app-bar"><div class="logo">PRUDÊNCIO</div><div class="title">Administrador</div><div class="actions"><img src="assets/mascote.jpg" class="user-avatar" onclick="navigateTo('screen-profile')"></div></div>
+      <div class="sub-tab-bar">
+        <button class="sub-tab-btn active" onclick="switchAdminTab('operators', this)">Operadores</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('forklifts', this)">Frota</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('shifts', this)">Turnos</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('tickets', this)">OS</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('audit', this)">Logs</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('settings', this)">Config</button>
+      </div>
+      <div class="admin-section active" id="admin-operators"><div id="admin-operators-list"></div><button class="btn-primary" onclick="requestAddOperator()">Novo Operador</button></div>
+      <div class="admin-section" id="admin-forklifts"><div id="admin-forklifts-list"></div><button class="btn-primary" onclick="requestAddForklift()">Nova Empilhadeira</button></div>
+      <div class="admin-section" id="admin-shifts"><input id="new-shift-input" placeholder="08:00 as 17:00"><button onclick="handleAddShift()">Adicionar</button><div id="admin-shifts-list"></div></div>
+      <div class="admin-section" id="admin-tickets"><div id="admin-tickets-list"></div></div>
+      <div class="admin-section" id="admin-audit"><div id="admin-audit-logs"></div></div>
+      <div class="admin-section" id="admin-settings"><div id="admin-company-settings"></div></div>
+      <nav class="nav-bar"><button class="nav-item" onclick="navigateTo('screen-dashboard')"><i data-lucide="layout-dashboard"></i><span>Painel</span></button><button class="nav-item" onclick="preparePreChecklist('EMP-05')"><i data-lucide="clipboard-check"></i><span>Checklist</span></button><button class="nav-item" onclick="navigateTo('screen-maintenance')"><i data-lucide="wrench"></i><span>Manutenção</span></button><button class="nav-item" onclick="navigateTo('screen-ranking')"><i data-lucide="trophy"></i><span>Ranking</span></button><button class="nav-item" onclick="navigateTo('screen-trainings')"><i data-lucide="graduation-cap"></i><span>Treinar</span></button><button class="nav-item active" onclick="verificarAcessoAdmin()"><i data-lucide="shield"></i><span>Admin</span></button></nav>
+    </section>
+
+    <!-- MODAIS -->
+    <div class="modal-overlay" id="modal-scanner"><div class="modal-content"><div class="modal-header"><h3>Escanear QR Code</h3><button onclick="toggleModal('modal-scanner')">×</button></div><div class="modal-body"><button class="btn-primary" onclick="simulateScanSuccess()">Simular Leitura</button></div></div></div>
+    <div class="modal-overlay" id="modal-scanner-real"><div class="modal-content"><div class="modal-header"><h3>📷 Escanear QR Code</h3><button onclick="toggleModal('modal-scanner-real')">×</button></div><div class="modal-body"><video id="scanner-video" autoplay playsinline></video><button onclick="toggleModal('modal-scanner-real')">Cancelar</button></div></div></div>
+    <div class="modal-overlay" id="modal-critical-block"><div class="modal-content"><div class="modal-header"><h3>⚠️ BLOQUEIO</h3></div><div class="modal-body"><p id="failed-item-name"></p><button class="btn-primary" onclick="closeCriticalBlock()">Fechar</button></div></div></div>
+    <div class="modal-overlay" id="modal-new-ticket"><div class="modal-content"><div class="modal-header"><h3>Novo Chamado</h3><button onclick="toggleModal('modal-new-ticket')">×</button></div><div class="modal-body"><form onsubmit="handleNewTicket(event)"><select id="ticket-forklift"><option value="EMP-01">EMP-01</option><option value="EMP-02">EMP-02</option><option value="EMP-05">EMP-05</option></select><textarea id="ticket-desc" required></textarea><button type="submit">Abrir</button></form></div></div></div>
+    <div class="modal-overlay" id="modal-new-report"><div class="modal-content"><div class="modal-header"><h3>Novo Relatório</h3><button onclick="toggleModal('modal-new-report')">×</button></div><div class="modal-body"><form onsubmit="handleGenerateReport(event)"><input id="report-name-input" placeholder="Nome"><select id="report-format-input"><option>PDF</option><option>XLS</option></select><button type="submit">Gerar</button></form></div></div></div>
+    <div class="modal-overlay" id="modal-add-operator"><div class="modal-content"><div class="modal-header"><h3>Novo Operador</h3><button onclick="toggleModal('modal-add-operator')">×</button></div><div class="modal-body"><form onsubmit="submitAddOperator(event)"><input id="add-operator-name" placeholder="Nome"><input id="add-operator-reg" placeholder="Matrícula"><select id="add-operator-role"><option>Operador Pleno</option></select><button type="submit">Cadastrar</button></form></div></div></div>
+    <div class="modal-overlay" id="modal-add-forklift"><div class="modal-content"><div class="modal-header"><h3>Nova Empilhadeira</h3><button onclick="toggleModal('modal-add-forklift')">×</button></div><div class="modal-body"><form onsubmit="submitAddForklift(event)"><input id="add-forklift-id" placeholder="ID"><input id="add-forklift-model" placeholder="Modelo"><input id="add-forklift-horometer" placeholder="Horas"><button type="submit">Cadastrar</button></form></div></div></div>
+    <div class="modal-overlay" id="modal-log-metric"><div class="modal-content"><div class="modal-header"><h3>Lançar Métricas</h3><button onclick="toggleModal('modal-log-metric')">×</button></div><div class="modal-body"><form onsubmit="submitLogMetric(event)"><select id="log-metric-type"><option value="horas">Horas</option><option value="avarias">Avarias</option><option value="trainings">Treinos</option></select><input id="log-metric-value" type="number"><button type="submit">Lançar</button></form></div></div></div>
+    <div class="modal-overlay" id="modal-checklist-detail"><div class="modal-content"><div class="modal-header"><h3>Detalhes</h3><button onclick="toggleModal('modal-checklist-detail')">×</button></div><div class="modal-body"><div id="detail-checklist-meta"></div><div id="detail-checklist-items"></div><img id="detail-checklist-signature"><button onclick="printChecklistDetail()">Imprimir</button></div></div></div>
+    <div class="modal-overlay" id="modal-edit-ticket-admin"><div class="modal-content"><div class="modal-header"><h3>Editar OS</h3><button onclick="toggleModal('modal-edit-ticket-admin')">×</button></div><div class="modal-body"><form onsubmit="submitAdminEditTicket(event)"><textarea id="admin-edit-ticket-desc"></textarea><input id="admin-edit-ticket-tech"><input id="admin-edit-ticket-sla"><select id="admin-edit-ticket-status"><option>EM ANÁLISE</option><option>CONCLUÍDO</option></select><button type="submit">Salvar</button></form></div></div></div>
+    <div class="modal-overlay" id="modal-admin-auth"><div class="modal-content"><div class="modal-header"><h3>🔐 Autenticação</h3><button onclick="cancelAdminAuth()">×</button></div><div class="modal-body"><form onsubmit="submitAdminAuth(event)"><input type="password" id="admin-auth-pass" placeholder="Senha ADM"><button type="submit">Autorizar</button></form></div></div></div>
+    <div class="modal-overlay" id="modal-notifications"><div class="modal-content"><div class="modal-header"><h3>Notificações</h3><button onclick="toggleModal('modal-notifications')">×</button></div><div class="modal-body"><p>Nenhuma notificação</p></div></div></div>
+
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Garantir que o app.js carregou corretamente
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      if (typeof loadState === 'function') loadState();
+      if (typeof syncStateToUI === 'function') syncStateToUI();
+      if (typeof renderChecklist === 'function') {
+        renderChecklist('checklist-start-items', state?.checklistStart || [], 'start');
+        renderChecklist('checklist-end-items', state?.checklistEnd || [], 'end');
+      }
+      if (typeof renderRanking === 'function') renderRanking();
+    });
+  </script>
+</body>
+</html>
