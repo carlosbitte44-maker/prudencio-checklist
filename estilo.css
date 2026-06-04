@@ -1,0 +1,15 @@
+<style>
+    /* Aqui entra todo o seu CSS original que estava no arquivo separado */
+    :root {
+      --color-primary: #FFC107;
+      --color-success: #28a745;
+      --color-danger: #dc3545;
+      --color-warning: #ffc107;
+      --color-text-main: #ffffff;
+      --color-text-muted: #a0a0a0;
+    }
+    body { background-color: #121212; color: white; font-family: sans-serif; }
+    .glass-card { background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 20px; }
+    .btn-primary { background-color: var(--color-primary); color: black; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+    /* Adicione aqui o restante do seu código CSS que você tem no arquivo estilos.css */
+  </style>
