@@ -4,8 +4,8 @@ const STATE_KEY = 'prudencio_checklist_state_v1';
 // Dados padrões de inicialização
 const defaultState = {
   currentUser: {
-    reg: 'PRU-902',
-    name: 'José Prudêncio',
+    reg: 'BRF-001',
+    name: 'Prudêncio',
     role: 'Operador Sênior'
   },
   operators: [
