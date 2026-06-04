@@ -2566,3 +2566,122 @@ function openChecklistDetail(id) {
 function printChecklistDetail() {
   window.print();
 }
+// =================== CONFIGURAÇÕES DA EMPRESA (PERSONALIZAÇÃO) ===================
+
+// Aplica o tema (cores e nome da empresa) em toda a interface
+function applyCompanyTheme() {
+  const settings = state.companySettings || { companyName: 'PRUDÊNCIO', primaryColor: '#FFC107' };
+  
+  // Atualiza as variáveis CSS com a cor principal
+  document.documentElement.style.setProperty('--color-primary', settings.primaryColor);
+  document.documentElement.style.setProperty('--color-primary-dark', settings.primaryColor);
+  
+  // Atualiza o nome da empresa em todos os lugares
+  document.querySelectorAll('.company-name, .logo, .splash-title-app').forEach(el => {
+    if (el && !el.classList.contains('no-replace')) {
+      el.innerText = settings.companyName + (el.classList.contains('splash-title-app') ? ' CHECKLIST' : '');
+    }
+  });
+  
+  // Atualiza o título da página
+  document.title = `${settings.companyName} Checklist - Segurança Operacional`;
+}
+
+// Renderiza o formulário de configurações no Admin
+function renderCompanySettings() {
+  const container = document.getElementById('admin-company-settings');
+  if (!container) return;
+  
+  const settings = state.companySettings || { companyName: 'PRUDÊNCIO', primaryColor: '#FFC107' };
+  
+  container.innerHTML = `
+    <div class="glass-card">
+      <h3 style="color: var(--color-primary); margin-bottom: 16px;">🎨 Personalização da Empresa</h3>
+      <p style="font-size: 12px; color: #a0a0a0; margin-bottom: 16px;">Altere o nome e a cor principal do sistema. As mudanças aparecem em tempo real.</p>
+      
+      <div class="input-group">
+        <label class="input-label">Nome da Empresa</label>
+        <div class="input-field-wrapper">
+          <input type="text" class="input-field" id="company-name-input" value="${settings.companyName}" placeholder="Ex: PRUDÊNCIO, FEDEX, etc.">
+          <i data-lucide="building-2"></i>
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Cor Principal</label>
+        <div class="input-field-wrapper">
+          <input type="color" class="input-field" id="company-color-input" value="${settings.primaryColor}" style="padding: 4px; height: 50px;">
+          <i data-lucide="palette"></i>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button class="btn-primary" onclick="saveCompanySettings()">
+          <i data-lucide="save"></i> Salvar Alterações
+        </button>
+        <button class="btn-secondary" onclick="resetCompanySettings()">
+          <i data-lucide="refresh-cw"></i> Restaurar Padrão
+        </button>
+      </div>
+      
+      <div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+        <p style="font-size: 11px; color: #a0a0a0;">
+          <i data-lucide="lock"></i> Para salvar as alterações, digite a senha: <strong>415263</strong>
+        </p>
+      </div>
+    </div>
+  `;
+  
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// Salva as configurações da empresa (com validação de senha)
+function saveCompanySettings() {
+  const senha = prompt("🔐 Confirme a senha para salvar as alterações:");
+  
+  if (senha !== '415263') {
+    alert("❌ Senha incorreta! Alterações NÃO foram salvas.");
+    return;
+  }
+  
+  const newCompanyName = document.getElementById('company-name-input')?.value.trim().toUpperCase() || 'PRUDÊNCIO';
+  const newPrimaryColor = document.getElementById('company-color-input')?.value || '#FFC107';
+  
+  if (!state.companySettings) {
+    state.companySettings = { companyName: 'PRUDÊNCIO', primaryColor: '#FFC107' };
+  }
+  
+  state.companySettings.companyName = newCompanyName;
+  state.companySettings.primaryColor = newPrimaryColor;
+  
+  saveState();
+  applyCompanyTheme();
+  
+  alert(`✅ Configurações salvas com sucesso!\n\nEmpresa: ${newCompanyName}\nCor: ${newPrimaryColor}`);
+  
+  renderCompanySettings();
+}
+
+// Restaura as configurações padrão
+function resetCompanySettings() {
+  const senha = prompt("🔐 Confirme a senha para restaurar as configurações padrão:");
+  
+  if (senha !== '415263') {
+    alert("❌ Senha incorreta! Configurações NÃO foram restauradas.");
+    return;
+  }
+  
+  state.companySettings = {
+    companyName: 'PRUDÊNCIO',
+    primaryColor: '#FFC107'
+  };
+  
+  saveState();
+  applyCompanyTheme();
+  
+  alert("✅ Configurações restauradas para o padrão (PRUDÊNCIO/Amarelo)");
+  renderCompanySettings();
+}
+
+// Adicione também no objeto defaultState do início do arquivo:
+// companySettings: { companyName: 'PRUDÊNCIO', primaryColor: '#FFC107' },
