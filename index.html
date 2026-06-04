@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Prudêncio Checklist - Segurança Operacional de Empilhadeiras</title>
   
   <link rel="stylesheet" href="estilos.css">
@@ -16,16 +16,6 @@
   
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Modo Offline ativado com sucesso!'))
-          .catch(err => console.log('Erro ao ativar offline:', err));
-      });
-    }
-  </script>
 </head>
 <body>
 
@@ -50,7 +40,7 @@
         <i data-lucide="layout-dashboard"></i>
         <span>Painel</span>
       </button>
-      <button class="nav-item" onclick="preparePreChecklist(state.selectedForkliftId || 'EMP-05')" id="nav-checklists">
+      <button class="nav-item" onclick="preparePreChecklist(state?.selectedForkliftId || 'EMP-05')" id="nav-checklists">
         <i data-lucide="clipboard-check"></i>
         <span>Checklist</span>
       </button>
@@ -66,15 +56,20 @@
         <i data-lucide="graduation-cap"></i>
         <span>Treinar</span>
       </button>
+      <button class="nav-item" onclick="navigateTo('screen-admin')" id="nav-admin">
+        <i data-lucide="shield"></i>
+        <span>Admin</span>
+      </button>
     </nav>
 
+    <!-- SPLASH SCREEN -->
     <section class="screen active" id="screen-splash">
       <div class="splash-mascote-container">
         <img src="assets/mascote.jpg" alt="Mascote Prudêncio" class="splash-mascote">
       </div>
       <h1 class="splash-title-app">PRUDÊNCIO CHECKLIST</h1>
       
-      <button class="btn-primary" id="btn-start-app" onclick="startApp()" style="margin-top: 16px; width: 220px; z-index: 10; display: flex; align-items: center; justify-content: center; gap: 10px; opacity: 0; animation: slideUpFade 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards 0.8s;">
+      <button class="btn-primary" id="btn-start-app" onclick="startApp()" style="margin-top: 16px; width: 220px; z-index: 10; display: flex; align-items: center; justify-content: center; gap: 10px;">
         <i data-lucide="play" style="width: 20px; height: 20px;"></i>
         <span>INICIAR</span>
       </button>
@@ -84,6 +79,7 @@
       </div>
     </section>
 
+    <!-- LOGIN -->
     <section class="screen" id="screen-login">
       <div class="glass-card login-card">
         <img src="assets/mascote.jpg" alt="Mascote Prudêncio" class="login-mascote">
@@ -113,13 +109,13 @@
         </form>
 
         <div class="login-footer">
-          <a href="#" class="forgot-password" onclick="alert('Contate a equipe de Segurança do Trabalho / TI para redefinir sua senha.')">Esqueci minha senha</a>
+          <a href="#" class="forgot-password" onclick="alert('Contate a equipe de Segurança do Trabalho / TI para redefinir sua senha.'); return false;">Esqueci minha senha</a>
           <div class="input-label" style="margin-top: 10px;">Ou entre com</div>
           <div class="biometrics-group">
-            <button class="biometrics-btn" onclick="simulateFingerprint()" title="Entrar por Digital">
+            <button type="button" class="biometrics-btn" onclick="simulateFingerprint()" title="Entrar por Digital">
               <i data-lucide="fingerprint"></i>
             </button>
-            <button class="biometrics-btn" onclick="openScanner()" title="Entrar por QR Code">
+            <button type="button" class="biometrics-btn" onclick="openScanner()" title="Entrar por QR Code">
               <i data-lucide="qr-code"></i>
             </button>
           </div>
@@ -127,6 +123,7 @@
       </div>
     </section>
 
+    <!-- DASHBOARD -->
     <section class="screen" id="screen-dashboard">
       <h2 class="dashboard-greeting">Bom dia, <span id="operator-name">Operador</span>!</h2>
       <div class="dashboard-motivation">Segurança sempre em primeiro lugar. Vamos ao checklist de hoje!</div>
@@ -170,9 +167,9 @@
       <div class="glass-card" style="padding: 10px 16px; margin-bottom: 24px;">
         <div class="gauge-section">
           <div class="gauge-container">
-            <svg class="gauge-svg">
+            <svg class="gauge-svg" viewBox="0 0 200 110">
               <circle class="gauge-bg" cx="100" cy="100" r="90"></circle>
-              <circle class="gauge-progress" id="conformity-gauge" cx="100" cy="100" r="90"></circle>
+              <circle class="gauge-progress" id="conformity-gauge" cx="100" cy="100" r="90" stroke-dasharray="282.7" stroke-dashoffset="0"></circle>
             </svg>
             <div class="gauge-value" id="gauge-percent">94%</div>
           </div>
@@ -185,24 +182,11 @@
       </div>
 
       <h3 class="bebas-font" style="font-size: 20px; margin-bottom: 12px;">Alertas Recentes</h3>
-      <div class="alert-list">
-        <div class="glass-card alert-item critical">
-          <div class="alert-info">
-            <div class="alert-item-title">Vazamento Hidráulico</div>
-            <div class="alert-item-desc">Equipamento: EMP-02 (Pátio B)</div>
-          </div>
-          <span class="alert-badge">CRÍTICO</span>
-        </div>
-        <div class="glass-card alert-item">
-          <div class="alert-info">
-            <div class="alert-item-title">Alarme Ré Falhando</div>
-            <div class="alert-item-desc">Equipamento: EMP-09 (Estoque)</div>
-          </div>
-          <span class="alert-badge">ATENÇÃO</span>
-        </div>
+      <div class="alert-list" id="dashboard-alerts-list">
       </div>
     </section>
 
+    <!-- PRÉ-CHECKLIST -->
     <section class="screen" id="screen-pre-checklist">
       <div class="checklist-header" style="margin-bottom: 24px;">
         <div class="report-icon-box" style="background-color: rgba(255, 193, 7, 0.1); width: 56px; height: 56px;">
@@ -296,9 +280,10 @@
       </div>
     </section>
 
+    <!-- CHECKLIST INÍCIO -->
     <section class="screen" id="screen-checklist-start">
       <div class="checklist-header">
-        <img src="assets/forklift.png" alt="Empilhadeira" class="forklift-thumb">
+        <img src="assets/forklift.png" alt="Empilhadeira" class="forklift-thumb" onerror="this.style.display='none'">
         <div class="checklist-header-info">
           <h3 class="checklist-header-title">Empilhadeira Hyster EMP-05</h3>
           <div class="checklist-header-subtitle">Operador: <span class="operator-profile-name">José Prudêncio</span></div>
@@ -306,4 +291,214 @@
         </div>
       </div>
 
-      <div class="checklist-items-container
+      <div class="checklist-items-container" id="checklist-start-items"></div>
+
+      <div class="signature-section glass-card">
+        <div class="signature-title">
+          <i data-lucide="pen-tool"></i>
+          <span>Assinatura Digital do Operador</span>
+        </div>
+        <canvas id="signature-start-canvas" class="signature-canvas" width="300" height="120" style="width: 100%; height: 120px; background: #000; border-radius: 8px; touch-action: none;"></canvas>
+        <div class="signature-actions">
+          <button type="button" class="btn-secondary" onclick="clearSignature('start')">Limpar Assinatura</button>
+        </div>
+      </div>
+
+      <div class="checklist-actions">
+        <button class="btn-primary" onclick="submitChecklist('start')">
+          <i data-lucide="send"></i>
+          FINALIZAR CHECKLIST INICIAL
+        </button>
+      </div>
+    </section>
+
+    <!-- CHECKLIST FIM -->
+    <section class="screen" id="screen-checklist-end">
+      <div class="checklist-header">
+        <img src="assets/forklift.png" alt="Empilhadeira" class="forklift-thumb" onerror="this.style.display='none'">
+        <div class="checklist-header-info">
+          <h3 class="checklist-header-title">Empilhadeira Hyster EMP-05</h3>
+          <div class="checklist-header-subtitle">Operador: <span class="operator-profile-name">José Prudêncio</span></div>
+          <div class="checklist-header-subtitle">Status: <span style="color: var(--color-danger);">Término de Turno</span></div>
+        </div>
+      </div>
+
+      <div class="checklist-items-container" id="checklist-end-items"></div>
+
+      <div class="signature-section glass-card">
+        <div class="signature-title">
+          <i data-lucide="pen-tool"></i>
+          <span>Assinatura Digital do Operador</span>
+        </div>
+        <canvas id="signature-end-canvas" class="signature-canvas" width="300" height="120" style="width: 100%; height: 120px; background: #000; border-radius: 8px; touch-action: none;"></canvas>
+        <div class="signature-actions">
+          <button type="button" class="btn-secondary" onclick="clearSignature('end')">Limpar Assinatura</button>
+        </div>
+      </div>
+
+      <div class="checklist-actions">
+        <button class="btn-primary" onclick="submitChecklist('end')">
+          <i data-lucide="send"></i>
+          FINALIZAR CHECKLIST DE SAÍDA
+        </button>
+      </div>
+    </section>
+
+    <!-- MANUTENÇÃO -->
+    <section class="screen" id="screen-maintenance">
+      <div class="sub-tab-bar">
+        <button class="sub-tab-btn active" onclick="switchMaintenanceTab('tickets', this)">Chamados Ativos</button>
+        <button class="sub-tab-btn" onclick="switchMaintenanceTab('history', this)">Histórico</button>
+      </div>
+
+      <div class="maintenance-section active" id="maintenance-tickets">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+          <button class="btn-primary" style="padding: 8px 16px;" onclick="toggleModal('modal-new-ticket')">
+            <i data-lucide="plus"></i>
+            Novo Chamado
+          </button>
+        </div>
+        <div id="tickets-list"></div>
+      </div>
+
+      <div class="maintenance-section" id="maintenance-history">
+        <div class="search-container">
+          <input type="text" class="input-field" placeholder="Filtrar histórico..." onkeyup="filterHistory(this.value)">
+          <i data-lucide="search"></i>
+        </div>
+        <div id="history-list"></div>
+      </div>
+    </section>
+
+    <!-- RANKING -->
+    <section class="screen" id="screen-ranking">
+      <h3 class="bebas-font" style="font-size: 22px; margin-bottom: 20px;">🏆 Ranking dos Operadores</h3>
+      <div class="ranking-podium" id="ranking-podium"></div>
+      <div class="ranking-table" id="ranking-table-list"></div>
+    </section>
+
+    <!-- TREINAMENTOS -->
+    <section class="screen" id="screen-trainings">
+      <h3 class="bebas-font" style="font-size: 22px; margin-bottom: 20px;">📚 Capacitação & DDS</h3>
+      
+      <div class="accordion-container">
+        <div class="accordion-item" id="accordion-1">
+          <div class="accordion-header" onclick="toggleAccordion('accordion-1')">
+            <span>📘 Operação Segura de Empilhadeira</span>
+            <i data-lucide="chevron-down"></i>
+          </div>
+          <div class="accordion-content">
+            <p>Curso completo sobre NR-11 e operação segura de empilhadeiras.</p>
+            <div class="training-actions">
+              <button class="btn-secondary" onclick="openPDF('Operação Segura')">📄 Material PDF</button>
+              <button class="btn-primary" onclick="playVideo('Operação Segura')">▶️ Assistir Vídeo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" id="accordion-2">
+          <div class="accordion-header" onclick="toggleAccordion('accordion-2')">
+            <span>⚠️ Prevenção de Acidentes</span>
+            <i data-lucide="chevron-down"></i>
+          </div>
+          <div class="accordion-content">
+            <p>DDS sobre prevenção de acidentes com empilhadeiras.</p>
+            <div class="training-actions">
+              <button class="btn-secondary" onclick="openPDF('Prevenção de Acidentes')">📄 Material PDF</button>
+              <button class="btn-primary" onclick="playVideo('Prevenção de Acidentes')">▶️ Assistir Vídeo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" id="accordion-3">
+          <div class="accordion-header" onclick="toggleAccordion('accordion-3')">
+            <span>🔄 Checklist Diário de Segurança</span>
+            <i data-lucide="chevron-down"></i>
+          </div>
+          <div class="accordion-content">
+            <p>Aprenda a realizar o checklist completo de segurança.</p>
+            <div class="training-actions">
+              <button class="btn-secondary" onclick="openPDF('Checklist Diário')">📄 Material PDF</button>
+              <button class="btn-primary" onclick="playVideo('Checklist Diário')">▶️ Assistir Vídeo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PERFIL -->
+    <section class="screen" id="screen-profile">
+      <div class="glass-card profile-header">
+        <img src="assets/mascote.jpg" alt="Avatar" class="profile-avatar-large" id="profile-avatar">
+        <h2 class="profile-name">José Prudêncio</h2>
+        <p class="profile-role">Operador Sênior • Matrícula: PRU-902</p>
+        <div class="profile-rank-badge">
+          <i data-lucide="trophy"></i>
+          <span>Ranking: <strong id="profile-rank-position">1º</strong></span>
+        </div>
+      </div>
+
+      <div class="glass-card profile-stats">
+        <h3 class="bebas-font" style="font-size: 18px;">📊 Ficha de Desempenho</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">Horas Produzidas</span>
+            <span class="stat-value" id="profile-hours">120h</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Avarias Registradas</span>
+            <span class="stat-value" id="profile-avarias">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Treinamentos</span>
+            <span class="stat-value" id="profile-trainings">3</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Checklists</span>
+            <span class="stat-value" id="profile-checklists">5</span>
+          </div>
+          <div class="stat-item total-score">
+            <span class="stat-label">Pontuação Total</span>
+            <span class="stat-value" id="profile-total-score">1450 pts</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-secondary" style="width: 100%; margin-top: 16px;" onclick="handleLogout()">
+        <i data-lucide="log-out"></i>
+        Sair do Sistema
+      </button>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="screen" id="screen-admin">
+      <div class="sub-tab-bar">
+        <button class="sub-tab-btn active" onclick="switchAdminTab('operators', this)">Operadores</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('forklifts', this)">Frota</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('shifts', this)">Turnos</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('tickets', this)">OS Corretivas</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('audit', this)">Logs</button>
+        <button class="sub-tab-btn" onclick="switchAdminTab('reports', this)">Relatórios</button>
+      </div>
+
+      <!-- Seções do Admin (conteúdo resumido para brevidade) -->
+      <div class="admin-section active" id="admin-operators"><div id="admin-operators-list"></div></div>
+      <div class="admin-section" id="admin-forklifts"><div id="admin-forklifts-list"></div></div>
+      <div class="admin-section" id="admin-shifts"><div id="admin-shifts-list"></div></div>
+      <div class="admin-section" id="admin-tickets"><div id="admin-tickets-list"></div></div>
+      <div class="admin-section" id="admin-audit"><div id="admin-audit-logs"></div></div>
+      <div class="admin-section" id="admin-reports"><div id="reports-list"></div><div id="checklist-history-list"></div></div>
+    </section>
+
+    <!-- MODAIS (resumidos para brevidade) -->
+    <div class="modal-overlay" id="modal-scanner"><div class="modal-content"><div class="modal-header"><h3>Escanear QR Code</h3><button class="modal-close" onclick="toggleModal('modal-scanner')">×</button></div><div class="modal-body"><button class="btn-primary" onclick="simulateScanSuccess()">Simular Leitura</button></div></div></div>
+    <div class="modal-overlay" id="modal-critical-block"><div class="modal-content modal-critical"><div class="modal-header"><h3 style="color: var(--color-danger);">⚠️ BLOQUEIO DE SEGURANÇA</h3></div><div class="modal-body"><p id="failed-item-name"></p><button class="btn-primary" onclick="closeCriticalBlock()">Fechar</button></div></div></div>
+    <div class="modal-overlay" id="modal-new-ticket"><div class="modal-content"><div class="modal-header"><h3>Abrir Chamado</h3><button class="modal-close" onclick="toggleModal('modal-new-ticket')">×</button></div><div class="modal-body"><form onsubmit="handleNewTicket(event)"><textarea id="ticket-desc" required></textarea><button type="submit">Abrir</button></form></div></div></div>
+    <div class="modal-overlay" id="modal-admin-auth"><div class="modal-content"><div class="modal-header"><h3>Autenticação Admin</h3></div><div class="modal-body"><form onsubmit="submitAdminAuth(event)"><input type="password" id="admin-auth-pass" placeholder="Senha Mestra"><button type="submit">Autorizar</button></form></div></div></div>
+    <!-- Adicione outros modais conforme necessário -->
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
